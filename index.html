@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dem Lottery - Enhanced</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: white;
+        }
+        
+        .container {
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 15px;
+            padding: 30px;
+            width: 90%;
+            max-width: 700px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: #ffdd00;
+            text-shadow: 0 0 10px rgba(255, 221, 0, 0.5);
+        }
+        
+        .header-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .xp-display {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-size: 1.2rem;
+        }
+        
+        .lottery-machine {
+            background: #2c3e50;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            position: relative;
+            overflow: hidden;
+            border: 3px solid #34495e;
+        }
+        
+        .machine-top {
+            height: 20px;
+            background: #7f8c8d;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+        
+        .number-display {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .number {
+            width: 60px;
+            height: 60px;
+            background: #ecf0f1;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #2c3e50;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .number.active {
+            background: #f1c40f;
+            transform: scale(1.1);
+            box-shadow: 0 0 20px #f1c40f;
+        }
+        
+        .draw-button {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            margin: 20px 0;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4);
+        }
+        
+        .draw-button:hover {
+            background: #c0392b;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(231, 76, 60, 0.6);
+        }
+        
+        .draw-button:active {
+            transform: translateY(1px);
+        }
+        
+        .draw-button:disabled {
+            background: #7f8c8d;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .results {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .xp-won {
+            font-size: 1.5rem;
+            color: #f1c40f;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        
+        .probability {
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: #ecf0f1;
+            opacity: 0.8;
+        }
+        
+        .history {
+            margin-top: 20px;
+            max-height: 150px;
+            overflow-y: auto;
+            text-align: left;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+        }
+        
+        .history-item {
+            padding: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .win {
+            color: #2ecc71;
+        }
+        
+        .loss {
+            color: #e74c3c;
+        }
+        
+        .features-section {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        .feature-button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            margin: 5px;
+            transition: all 0.3s ease;
+        }
+        
+        .feature-button:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+        
+        .feature-button:disabled {
+            background: #7f8c8d;
+            cursor: not-allowed;
+        }
+        
+        .special-event {
+            margin: 15px 0;
+            padding: 10px;
+            background: rgba(155, 89, 182, 0.3);
+            border-radius: 8px;
+            animation: glow 2s infinite;
+        }
+        
+        @keyframes glow {
+            0% { box-shadow: 0 0 5px rgba(155, 89, 182, 0.5); }
+            50% { box-shadow: 0 0 20px rgba(155, 89, 182, 0.8); }
+            100% { box-shadow: 0 0 5px rgba(155, 89, 182, 0.5); }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .pulse {
+            animation: pulse 0.5s ease-in-out;
+        }
+        
+        @keyframes confetti {
+            0% { transform: translateY(0) rotate(0); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
+        
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: #f1c40f;
+            opacity: 0;
+        }
+        
+        .jackpot-notice {
+            font-size: 1.2rem;
+            color: #f1c40f;
+            margin: 10px 0;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(241, 196, 15, 0.8);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header-section">
+            <h1>Dem Lottery</h1>
+            <div class="xp-display">Total XP: <span id="totalXP">1000</span></div>
+        </div>
+        
+        <div class="special-event" id="specialEvent" style="display: none;">
+            <h3 id="eventTitle">Special Event!</h3>
+            <p id="eventDescription">Description of the special event</p>
+        </div>
+        
+        <div class="lottery-machine">
+            <div class="machine-top"></div>
+            <div class="number-display">
+                <div class="number">?</div>
+                <div class="number">?</div>
+                <div class="number">?</div>
+                <div class="number">?</div>
+                <div class="number">?</div>
+            </div>
+            <button class="draw-button" id="drawButton">Draw Numbers (10 XP)</button>
+            
+            <div id="jackpotNotice" class="jackpot-notice" style="display: none;">
+                JACKPOT INCREASING! Next win: <span id="jackpotValue">5000</span> XP
+            </div>
+        </div>
+        
+        <div class="features-section">
+            <button class="feature-button" id="luckyDipButton">Lucky Dip (5 XP)</button>
+            <button class="feature-button" id="doubleChanceButton">Double Chance (25 XP)</button>
+            <button class="feature-button" id="randomMultiplierButton">Random Multiplier (50 XP)</button>
+        </div>
+        
+        <div class="results">
+            <h3>Your Prize:</h3>
+            <div class="xp-won" id="xpWon">0 XP</div>
+            <p id="resultText">Click the button to draw numbers!</p>
+        </div>
+        
+        <div class="probability">
+            <p>Chance to win 1000 XP: 1 in 100 | Chance to win 100 XP: 1 in 20 | Chance to win 10 XP: 1 in 5</p>
+        </div>
+        
+        <div class="history">
+            <h3>Draw History</h3>
+            <div id="historyList"></div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const drawButton = document.getElementById('drawButton');
+            const luckyDipButton = document.getElementById('luckyDipButton');
+            const doubleChanceButton = document.getElementById('doubleChanceButton');
+            const randomMultiplierButton = document.getElementById('randomMultiplierButton');
+            const numbers = document.querySelectorAll('.number');
+            const xpWon = document.getElementById('xpWon');
+            const totalXPSpan = document.getElementById('totalXP');
+            const resultText = document.getElementById('resultText');
+            const historyList = document.getElementById('historyList');
+            const specialEvent = document.getElementById('specialEvent');
+            const eventTitle = document.getElementById('eventTitle');
+            const eventDescription = document.getElementById('eventDescription');
+            const jackpotNotice = document.getElementById('jackpotNotice');
+            const jackpotValue = document.getElementById('jackpotValue');
+            
+            let totalXP = 1000;
+            let drawCount = 0;
+            let jackpot = 5000;
+            let jackpotActive = false;
+            let doubleChanceActive = false;
+            let randomMultiplierActive = false;
+            let specialEventActive = false;
+            
+            updateUI();
+            
+            drawButton.addEventListener('click', function() {
+                if (totalXP >= 10) {
+                    totalXP -= 10;
+                    updateUI();
+                    drawNumbers();
+                } else {
+                    resultText.textContent = "Not enough XP to play!";
+                }
+            });
+            
+            luckyDipButton.addEventListener('click', function() {
+                if (totalXP >= 5) {
+                    totalXP -= 5;
+                    updateUI();
+                    activateLuckyDip();
+                } else {
+                    resultText.textContent = "Not enough XP for Lucky Dip!";
+                }
+            });
+            
+            doubleChanceButton.addEventListener('click', function() {
+                if (totalXP >= 25) {
+                    totalXP -= 25;
+                    updateUI();
+                    activateDoubleChance();
+                } else {
+                    resultText.textContent = "Not enough XP for Double Chance!";
+                }
+            });
+            
+            randomMultiplierButton.addEventListener('click', function() {
+                if (totalXP >= 50) {
+                    totalXP -= 50;
+                    updateUI();
+                    activateRandomMultiplier();
+                } else {
+                    resultText.textContent = "Not enough XP for Random Multiplier!";
+                }
+            });
+            
+            function drawNumbers() {
+                // Disable buttons during draw
+                setButtonsDisabled(true);
+                drawButton.textContent = 'Drawing...';
+                
+                // Reset display
+                numbers.forEach(num => {
+                    num.textContent = '?';
+                    num.classList.remove('active');
+                });
+                
+                xpWon.textContent = '0 XP';
+                resultText.textContent = 'Drawing numbers...';
+                
+                // Check for random event (5% chance)
+                if (Math.random() < 0.05 && !specialEventActive) {
+                    triggerRandomEvent();
+                }
+                
+                // Animate number selection
+                let draws = 0;
+                const totalDraws = 20;
+                const drawInterval = setInterval(() => {
+                    // Generate temporary random numbers
+                    numbers.forEach(num => {
+                        num.textContent = Math.floor(Math.random() * 9) + 1;
+                    });
+                    
+                    draws++;
+                    if (draws >= totalDraws) {
+                        clearInterval(drawInterval);
+                        finalizeDraw();
+                    }
+                }, 100);
+            }
+            
+            function finalizeDraw() {
+                // Generate final numbers
+                const finalNumbers = [];
+                numbers.forEach(num => {
+                    const randomNum = Math.floor(Math.random() * 9) + 1;
+                    num.textContent = randomNum;
+                    finalNumbers.push(randomNum);
+                    num.classList.add('active');
+                });
+                
+                // Calculate XP won
+                let xp = calculateXP(finalNumbers);
+                
+                // Apply double chance if active
+                if (doubleChanceActive) {
+                    xp *= 2;
+                    doubleChanceActive = false;
+                }
+                
+                // Apply random multiplier if active
+                if (randomMultiplierActive) {
+                    const multiplier = Math.floor(Math.random() * 5) + 1;
+                    xp *= multiplier;
+                    resultText.textContent = `Random ${multiplier}x multiplier applied!`;
+                    randomMultiplierActive = false;
+                }
+                
+                // Check for jackpot
+                if (jackpotActive && xp > 0) {
+                    xp += jackpot;
+                    resultText.textContent = `JACKPOT! You won ${jackpot} XP bonus!`;
+                    jackpot = 5000;
+                    jackpotActive = false;
+                    jackpotNotice.style.display = 'none';
+                }
+                
+                // Add XP to total
+                totalXP += xp;
+                
+                // Animate XP display
+                animateXP(0, xp, 1500);
+                
+                // Display result
+                if (xp > 0) {
+                    if (xp >= 1000) {
+                        createConfetti();
+                    }
+                } else {
+                    resultText.textContent = 'Sorry, no matches this time. Try again!';
+                    
+                    // Increase jackpot if no win
+                    if (!jackpotActive) {
+                        jackpot += 250;
+                        jackpotActive = true;
+                        jackpotNotice.style.display = 'block';
+                        jackpotValue.textContent = jackpot;
+                    }
+                }
+                
+                // Add to history
+                addToHistory(finalNumbers, xp);
+                
+                // Re-enable buttons
+                setButtonsDisabled(false);
+                drawButton.textContent = 'Draw Again (10 XP)';
+                
+                drawCount++;
+                updateUI();
+            }
+            
+            function calculateXP(numbers) {
+                // Check for matches to determine XP
+                const uniqueNumbers = new Set(numbers);
+                
+                // All five numbers the same (1 in 100 chance)
+                if (uniqueNumbers.size === 1) {
+                    return 1000;
+                }
+                
+                // Four numbers the same (approximately 1 in 20 chance)
+                const counts = {};
+                numbers.forEach(num => {
+                    counts[num] = (counts[num] || 0) + 1;
+                });
+                
+                if (Object.values(counts).includes(4)) {
+                    return 100;
+                }
+                
+                // Three numbers the same (approximately 1 in 5 chance)
+                if (Object.values(counts).includes(3)) {
+                    return 10;
+                }
+                
+                // No winning matches
+                return 0;
+            }
+            
+            function animateXP(start, end, duration) {
+                let startTimestamp = null;
+                const step = (timestamp) => {
+                    if (!startTimestamp) startTimestamp = timestamp;
+                    const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                    xpWon.textContent = Math.floor(progress * (end - start) + start) + " XP";
+                    if (progress < 1) {
+                        window.requestAnimationFrame(step);
+                    }
+                };
+                window.requestAnimationFrame(step);
+            }
+            
+            function addToHistory(numbers, xp) {
+                const historyItem = document.createElement('div');
+                historyItem.classList.add('history-item');
+                historyItem.classList.add(xp > 0 ? 'win' : 'loss');
+                
+                const numbersText = numbers.join(' - ');
+                historyItem.textContent = `Draw #${drawCount + 1}: ${numbersText} - ${xp} XP`;
+                
+                historyList.prepend(historyItem);
+            }
+            
+            function createConfetti() {
+                const colors = ['#f1c40f', '#e74c3c', '#3498db', '#2ecc71', '#9b59b6', '#1abc9c'];
+                
+                for (let i = 0; i < 100; i++) {
+                    const confetti = document.createElement('div');
+                    confetti.classList.add('confetti');
+                    confetti.style.left = Math.random() * 100 + 'vw';
+                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.width = (Math.random() * 10 + 5) + 'px';
+                    confetti.style.height = (Math.random() * 10 + 5) + 'px';
+                    
+                    document.body.appendChild(confetti);
+                    
+                    const animationDuration = Math.random() * 3 + 2;
+                    confetti.style.animation = `confetti ${animationDuration}s ease-in forwards`;
+                    
+                    setTimeout(() => {
+                        confetti.remove();
+                    }, animationDuration * 1000);
+                }
+            }
+            
+            function activateLuckyDip() {
+                // Generate lucky numbers for the user
+                const luckyNumbers = [
+                    Math.floor(Math.random() * 9) + 1,
+                    Math.floor(Math.random() * 9) + 1,
+                    Math.floor(Math.random() * 9) + 1,
+                    Math.floor(Math.random() * 9) + 1,
+                    Math.floor(Math.random() * 9) + 1
+                ];
+                
+                // Display the lucky numbers
+                numbers.forEach((num, index) => {
+                    num.textContent = luckyNumbers[index];
+                    num.classList.add('active');
+                });
+                
+                resultText.textContent = "Lucky Dip activated! These are your numbers for the next draw.";
+                
+                // After a delay, reset for the actual draw
+                setTimeout(() => {
+                    numbers.forEach(num => {
+                        num.textContent = '?';
+                        num.classList.remove('active');
+                    });
+                    drawNumbers();
+                }, 2000);
+            }
+            
+            function activateDoubleChance() {
+                doubleChanceActive = true;
+                resultText.textContent = "Double Chance activated! Your next win will be doubled.";
+                
+                // After a delay, start the draw
+                setTimeout(() => {
+                    drawNumbers();
+                }, 1500);
+            }
+            
+            function activateRandomMultiplier() {
+                randomMultiplierActive = true;
+                resultText.textContent = "Random Multiplier activated! Your next win will be multiplied.";
+                
+                // After a delay, start the draw
+                setTimeout(() => {
+                    drawNumbers();
+                }, 1500);
+            }
+            
+            function triggerRandomEvent() {
+                specialEventActive = true;
+                const events = [
+                    {
+                        title: "Lucky Day!",
+                        description: "All prizes are doubled for the next draw!",
+                        effect: () => { doubleChanceActive = true; }
+                    },
+                    {
+                        title: "Number Swap",
+                        description: "Two numbers have been swapped for better chances!",
+                        effect: () => {
+                            // Swap two random numbers
+                            const idx1 = Math.floor(Math.random() * 5);
+                            let idx2 = Math.floor(Math.random() * 5);
+                            while (idx2 === idx1) idx2 = Math.floor(Math.random() * 5);
+                            
+                            // This effect would be applied during the draw
+                        }
+                    },
+                    {
+                        title: "XP Rain",
+                        description: "+50 XP for everyone!",
+                        effect: () => {
+                            totalXP += 50;
+                            updateUI();
+                        }
+                    }
+                ];
+                
+                const event = events[Math.floor(Math.random() * events.length)];
+                eventTitle.textContent = event.title;
+                eventDescription.textContent = event.description;
+                specialEvent.style.display = 'block';
+                
+                // Apply event effect
+                event.effect();
+                
+                // Hide event after 5 seconds
+                setTimeout(() => {
+                    specialEvent.style.display = 'none';
+                    specialEventActive = false;
+                }, 5000);
+            }
+            
+            function setButtonsDisabled(disabled) {
+                drawButton.disabled = disabled;
+                luckyDipButton.disabled = disabled;
+                doubleChanceButton.disabled = disabled;
+                randomMultiplierButton.disabled = disabled;
+            }
+            
+            function updateUI() {
+                totalXPSpan.textContent = totalXP;
+                
+                // Update button states based on XP
+                luckyDipButton.disabled = totalXP < 5;
+                doubleChanceButton.disabled = totalXP < 25;
+                randomMultiplierButton.disabled = totalXP < 50;
+            }
+        });
+    </script>
+</body>
+</html>
